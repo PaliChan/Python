@@ -1,0 +1,547 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+import tkinter as tk
+from PIL import Image, ImageTk
+import threading
+
+import time
+
+def ejecutar_ventana_grafica():
+    # Crear la ventana principal
+    ventana = tk.Tk()
+    ventana.title("Ejemplo de Tkinter con imagen y texto")
+
+    # Definir el tamaño de la ventana
+    ventana.geometry("600x400")
+
+    # Cargar la imagen
+    imagen = Image.open("915f4277-d252-40f7-8da5-4944bf155d13_width=512&height=1024.jpg")  # Reemplaza "ejemplo_imagen.jpg" con la ruta de tu imagen
+    imagen = imagen.resize((300, 800))  # Redimensiona la imagen al tamaño deseado
+    imagen_tk = ImageTk.PhotoImage(imagen)
+
+    # Crear un widget de etiqueta para mostrar la imagen
+    etiqueta_imagen = tk.Label(ventana, image=imagen_tk)
+    etiqueta_imagen.pack(pady=10)  # Añade un espacio de relleno vertical entre la imagen y el texto
+
+    # Mostrar texto
+    texto = "¡Hola desde Tkinter!"
+    etiqueta_texto = tk.Label(ventana, text=texto, font=("Arial", 16))
+    etiqueta_texto.pack()
+
+    # Ejecutar el bucle principal de la ventana
+    ventana.mainloop()
+
+# Ruta al ejecutable de ChromeDriver
+chrome_driver_path = r'C:\Users\Sebastian\Downloads\chromedriver-win64\chromedriver.exe'
+
+# Crear una instancia del servicio de ChromeDriver
+chrome_service = ChromeService(chrome_driver_path)
+
+# Crear una instancia del navegador Chrome
+google_chrome = webdriver.Chrome(service=chrome_service)
+
+# URL de la página web
+url = 'https://s252-es.ogame.gameforge.com/game/index.php?page=ingame&component=overview'
+
+# Navegar a la página web
+google_chrome.get(url)
+
+#xPats de elementos html
+btn_aceptar_cookies = '//*[@class="cookiebanner5"]'
+btn_conectarse_usando_google = '//*[@class="button button-google button-md"]'
+btn_jugar_ultimo_universo = '//*[@class="button button-default button-md"]/button'
+info_metal_planeta_actual = '//span[@class="resources_metal"]'
+info_cristal_planeta_actual = ""
+info_deuterio_planeta_actual = ""
+info_energia_planeta_actual = ""
+
+#menu navegacion
+a_vision_general = "//a[@data-ipi-hint='ipiToolbarOverview']"
+a_recursos = "//a[@data-ipi-hint='ipiToolbarResourcebuildings']"
+a_forma_de_vida = ""
+a_instalaciones = ""
+a_mercader = ""
+a_investigacion = ""
+a_hangar = ""
+a_defensa = ""
+a_flota = ""
+a_galaxia = ""
+a_imperio = "//a[@data-ipi-hint='ipiToolbarEmpire']"
+a_alianza = ""
+a_casino_de_oficiales = ""
+a_tienda = ""
+
+#listas
+lista_planetas = []
+lista_tareas = []
+
+class Tarea:
+
+    #expedicion, enviar flota
+    tipo = "subir mina"
+    nivel = 0
+    planeta = ""
+    mina = "metal"
+    #pantalla a la que debe ir para comenzar el script
+    xpath_pantalla = ""
+    script = ""
+    prioridad = 0
+
+    tiempo_faltante = 0
+
+    costo_metal = 0
+    costo_cristal = 0
+    costo_deuterio = 0
+    costo_energia = 0
+
+    #constructor
+    def __init__(self, tipo):
+        self.definir_prioridad(tipo)
+        self.ordenar_prioridades()
+        self.realizar_tarea()
+
+    def realizar_tarea(self):
+        global lista_tareas
+
+        #verificar que haya tareas
+        if len(lista_tareas) > 0:
+
+            #si es subir mina
+            if lista_tareas[0].tipo == "subir mina":
+                if self.planeta.metal >= self.costo_metal and self.planeta.cistal >= self.costo_cristal:
+                    Scripts.subir_mina(self)
+                #verificar si hay recursos suficientes en el planeta
+                #verificar si hay recursos suficientes en todos los planetas
+                    #verificar si hay naves suficientes y combustible para transportar recursos al planeta
+                    #enviar naves
+                    #calcular tiempo para poder realizar tarea 
+
+
+
+    #mientras numero mas bajo prioridad mas alta de tarea a realizar
+    def definir_prioridad(self, tipo):
+
+        if tipo == "bajo ataque":
+
+            self.prioridad = 1
+
+        elif tipo == "subir mina":
+
+            self.prioridad = 2
+
+        elif tipo == "enviar transporte":
+
+            self.prioridad = 3
+
+        elif tipo == "expedicion":
+
+            self.prioridad = 4
+
+    #ordena lista_tareas segun prioridad
+    def ordenar_prioridades():
+        global lista_tareas
+        lista_tareas = sorted(lista_tareas, key=lambda x: x.prioridad)
+    """
+    cambios = True
+    while cambios:
+        cambios = False  # Establecer cambios a False al inicio de cada iteración
+        for indice in range(len(lista_tareas) - 1):  # Ajustar el rango para evitar IndexError
+            if lista_tareas[indice].prioridad > lista_tareas[indice + 1].prioridad:
+                # Algoritmo burbuja
+                lista_tareas[indice], lista_tareas[indice + 1] = lista_tareas[indice + 1], lista_tareas[indice]
+                cambios = True  # Se produjo un cambio, establecer cambios a True
+    """
+        
+
+
+
+    def verificar_recursos_suficientes(self):
+        pass
+
+    def verificar_tiempo_espera(self):
+        global lista_planetas
+
+        for planeta in lista_planetas:
+            Scripts.verificar_tiempo_espera()
+
+
+class Planeta:
+
+    a_ref = ""
+    nombre = ""
+
+    #recursos
+    metal = 0
+    cristal = 0
+    deuterio = 0
+    energia = 0
+
+    almacen_metal = ""
+    almacen_cristal = ""
+    almacen_deuterio = ""
+
+    nivel_metal = 0
+    nivel_cristal = 0
+    nivel_deuterio = 0
+    nivel_energia = 0
+    nivel_planta_fusion = 0
+    nivel_almacen_metal = 0
+    nivel_almacen_cristal = 0
+    nivel_almacen_deuterio = 0
+    nivel_fabrica_robots = 0
+    nivel_fabrica_nanobots = 0
+    nivel_hangar = 0
+    nivel_laboratorio = 0
+    nivel_terraformer = 0
+    nivel_deposito_alianza = 0
+    nivel_silo = 0
+    nivel_astillero_orbital = 0
+
+    #tiempo de espera
+    tiempo_espera = 0
+
+    #hangar
+    nave_cazador_ligero = 0
+    nave_cazador_pesado = 0
+    nave_crucero = 0
+    nave_nave_batalla = 0
+    nave_acorazado = 0
+    nave_bombardero = 0
+    nave_destructor = 0
+    nave_estrella_muerte = 0
+    nave_segador = 0
+    
+    nave_explorador =0
+    nave_pequeña_carga = 0
+    nave_grande_carga = 0
+    nave_recolector = 0
+    nave_colonizador = 0
+    nave_reciclador = 0
+    nave_sonda_espionaje = 0
+    nave_satelite = 0
+    nave_taladrador = 0
+
+    #defensas
+    defensa_lanzamisil = 0
+    defensa_laser_pequeño = 0
+    defensa_laser_grande = 0
+    defensa_cañon_ionico = 0
+    defensa_cañon_gaus = 0
+    defensa_cañon_plasma = 0
+    defensa_cupula_pequeña = 0
+    defensa_cupula_grande = 0
+    defensa_misil_antibalistico = 0
+
+    #investigacion
+    tecnologia_energia = 0
+    tecnologia_laser = 0
+    tecnologia_ionica = 0
+    tecnologia_hiperespacio = 0
+    tecnologia_plasma = 0
+    tecnologia_espionaje = 0
+    tecnologia_computacion =0
+    astrofisica =0
+    red_investigacion_intergalactica =0
+    tecnologia_graviton =0
+    motor_combustion = 0
+    motor_impulso =0
+    propulsor_hiperespacial =0
+    tecnologia_militar =0
+    tecnologia_defensa =0
+    tecnologia_blindaje =0
+
+    #--> "metal", "crystal", "deuterium"
+    #<-- recurso.txt
+    def obtener_txt_recurso(self, clase):
+                
+        ref = f"//div[@id='{self.id}']//*[contains(@class, '{clase}')]//span"
+        metal = google_chrome.find_element(By.XPATH, ref)
+        return metal.text
+    
+    def obtener_txt_recurso_planeta0(self, clase):
+
+        ref = f"//div[@id='{self.id}']//*[contains(@class, '{clase}')]"
+        metal = google_chrome.find_element(By.XPATH, ref)
+        return metal.text
+
+    #quita "+", "." <-- convierte a int
+    def convertir_numero(self, texto):
+        texto = texto.replace("+", "")
+        texto = texto.replace(".", "")
+
+        return int(texto)
+
+    #constructor
+    def __init__(self, id):
+        self.id = id
+
+        if id ==  "planet0":
+
+            self.metal = self.obtener_txt_recurso_planeta0("metal")
+            self.cristal = self.obtener_txt_recurso_planeta0("crystal")
+            self.deuterio = self.obtener_txt_recurso_planeta0("deuterium")
+            
+        else:
+            #nombre, pero si es largo no queda completo
+            self.nombre = google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'planetname')]").text
+            
+            #minas
+            self.metal = self.convertir_numero(self.obtener_txt_recurso("metal"))
+            self.cristal = self.convertir_numero(self.obtener_txt_recurso("crystal"))
+            self.deuterio = self.convertir_numero(self.obtener_txt_recurso("deuterium"))
+            self.energia = self.convertir_numero(self.obtener_txt_recurso_planeta0("undermark"))
+            #contenedores
+            self.almacen_metal = self.convertir_numero(self.obtener_txt_recurso_planeta0("metalStorage"))
+            self.almacen_cristal = self.convertir_numero(self.obtener_txt_recurso_planeta0("crystalStorage"))
+            self.almacen_deuterio = self.convertir_numero(self.obtener_txt_recurso_planeta0("deuteriumStorage"))
+            #niveles
+            self.nivel_metal = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '1 ')]").text)
+            self.nivel_cristal = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '2 ')]").text)
+            self.nivel_deuterio = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '3 ')]").text)
+            self.nivel_energia = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '4 ')]").text)
+            self.nivel_planta_fusion = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '12 ')]").text)
+            self.nivel_almacen_metal = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '22 ')]").text)
+            self.almacen_cristal = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '23 ')]").text)
+            self.almacen_deuterio = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values supply groupsupply')]//*[contains(@class, '24 ')]").text)
+
+            self.nivel_fabrica_robots = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '14 ')]").text)
+            self.nivel_fabrica_nanobots = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '15 ')]").text)
+            self.nivel_hangar = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '21 ')]").text)
+            self.nivel_laboratorio = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '31 ')]").text)
+            self.nivel_terraformer = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '33 ')]").text)
+            self.nivel_deposito_alianza = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '34 ')]").text)
+            self.nivel_silo = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '44 ')]").text)
+            self.nivel_astillero_orbital = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values station groupstation')]//*[contains(@class, '36 ')]").text)
+            #defensas
+            self.defensa_lanzamisil = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '401 ')]").text)
+            self.defensa_laser_pequeño = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '402 ')]").text)
+            self.defensa_laser_grande = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '403 ')]").text)
+            self.defensa_cañon_gaus = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '404 ')]").text)
+            self.defensa_cañon_ionico = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '405 ')]").text)
+            self.defensa_cañon_plasma = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '406 ')]").text)
+            self.defensa_cupula_pequeña = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '407 ')]").text)
+            self.defensa_cupula_grande = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '408 ')]").text)
+            self.defensa_misil_antibalistico = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '502 ')]").text)
+            self.defensa_misil_interplanetario = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values defence groupdefence')]//*[contains(@class, '503 ')]").text)
+        
+        #naves
+            self.nave_cazador_ligero = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '204 ')]").text)
+            self.nave_cazador_pesado = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '205 ')]").text)  
+            self.nave_crucero = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '206 ')]").text)
+            self.nave_nave_batalla = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '207 ')]").text)
+            self.nave_acorazado = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '215 ')]").text)
+            self.nave_bombardero = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '211 ')]").text)
+            self.nave_destructor = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '213 ')]").text)
+            self.nave_estrella_muerte = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '214 ')]").text)
+            self.nave_segador = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '218 ')]").text)
+            
+            self.nave_explorador = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '219 ')]").text)
+            self.nave_pequeña_carga = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '202 ')]").text)
+            self.nave_grande_carga = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '203 ')]").text)
+            self.nave_colonizador = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '208 ')]").text)
+            self.nave_reciclador = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '209 ')]").text)
+            self.nave_sonda_espionaje = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '210 ')]").text)
+            self.nave_satelite = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '212 ')]").text)
+            self.nave_taladrador = self.convertir_numero(google_chrome.find_element(By.XPATH, f"//div[@id='{self.id}']//*[contains(@class, 'values ships groupships')]//*[contains(@class, '217 ')]").text)
+        
+            self.tiempo_espera = 0
+            print(f"id_planeta: {self.id} nombre: {self.nombre}")
+
+class Scripts:
+
+    @staticmethod
+    def logearse_primera_vez():
+    
+
+        #click aceptar cookies
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='cookiebanner5']")))
+        coso.click()
+            
+        #click btn login
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginRegisterTabs']/ul/li[1]")))
+        coso.click()
+        
+        #esperar
+        WebDriverWait(google_chrome, 2)
+
+        #escribir email
+        coso = WebDriverWait(google_chrome, 130).until(EC.visibility_of_element_located((By.XPATH, "//*[@name='email' and @type='email']")))
+        coso.send_keys("juanlopez13131415@gmail.com")
+
+        #escribir contraseña
+        coso = WebDriverWait(google_chrome, 130).until(EC.visibility_of_element_located((By.XPATH, "//*[@name='password' and @type='password']")))
+        coso.send_keys("Pulpito1313")
+
+        #click btn iniciar sesion
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='button button-primary button-lg']")))
+        coso.click()
+
+        #esperar por boton ultimo universo jugado
+        btn_ultimo_universo = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, "//*[@class='button button-default button-md']")))
+
+        #seleccionar body y bajar dos veces
+        elemento = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, '/html/body')))
+
+        elemento.send_keys(Keys.ARROW_DOWN)
+        elemento.send_keys(Keys.ARROW_DOWN)
+        elemento.send_keys(Keys.ARROW_DOWN)
+
+        WebDriverWait(google_chrome, 3)
+
+        #click btn ultimo universo jugado
+        #esperar por boton ultimo universo jugado
+        btn_ultimo_universo = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='button button-default button-md']")))
+        btn_ultimo_universo.click()
+
+        # Espera a que se abra la nueva pestaña
+        WebDriverWait(google_chrome, 160).until(lambda x: len(google_chrome.window_handles) > 1)
+        
+        google_chrome.switch_to.window(google_chrome.window_handles[1]) 
+        WebDriverWait(google_chrome, 160).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="resources_metal"]')))
+        google_chrome.switch_to.window(google_chrome.window_handles[0])     
+        google_chrome.close()
+        google_chrome.switch_to.window(google_chrome.window_handles[0])
+
+    @staticmethod
+    def subir_mina(tarea):
+        global a_recursos
+
+        #click en el planeta correspondiente
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, tarea.planeta.a_ref)))
+        coso.click()
+
+        #click en recursos
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, a_recursos)))
+        coso.click()
+
+        if tarea.mina == "metal":
+            
+            #edificio metal
+            coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(@class, 'technology metalMine')]")))
+            coso.click()
+
+            #boton upgrade
+            coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//button[@class='upgrade']")))
+            coso.click()
+
+            #tiempo espera
+            elemento = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, "//li[contains(@class, 'technology metalMine')]")))
+            tarea.planeta.tiempo_espera = int(elemento.get_attribute("data-end"))
+
+        elif tarea.mina == "cristal":
+            #edificio cristal
+            coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(@class, 'technology crystalMine')]")))
+            coso.click()
+
+            #boton upgrade
+            coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, "//button[@class='upgrade']")))
+            coso.click()
+
+            #tiempo espera
+            elemento = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, "//li[contains(@class, 'technology crystalMine')]")))
+            tarea.planeta.tiempo_espera = int(elemento.get_attribute("data-end"))
+
+    @staticmethod
+    def verificar_tiempo_espera(planeta):
+        global a_recursos
+
+        #click recursos
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, a_recursos)))
+        coso.click()
+
+        coso = WebDriverWait(google_chrome, 130).until(EC.element_to_be_clickable((By.XPATH, planeta.a_ref)))
+        coso.click()
+
+        
+
+        #click planeta
+
+        tiempo_espera_edificios = False
+        tiempo_espera_instalaciones = False
+
+        try:
+            #buscar tiempo
+            coso = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, "//*[@class='countdown']")))
+            
+            planeta.tiempo_espera = coso.get_attribute('data-end')
+            print(type(planeta.tiempo_espera))
+            tiempo_espera_edificios = True
+            
+
+        except:
+            print("no hay tiempo de espera en recursos.")
+
+        try:
+            if not tiempo_espera_edificios:
+                #buscar tiempo
+                coso = WebDriverWait(google_chrome, 130).until(EC.presence_of_element_located((By.XPATH, "//*[@class='countdown']")))
+                
+                planeta.tiempo_espera = coso.get_attribute('data-end')
+                print(type(planeta.tiempo_espera))
+                tiempo_espera_instalaciones = True
+
+        except:
+            print("no hay tiempo de espera en instalaciones.")
+
+        if Planeta.tiempo_espera < time.time():
+            return True
+        else:
+            return False
+
+
+def cargar_a_planetas():
+    global lista_a_planetas, a_vision_general
+
+    google_chrome.find_element(By.XPATH, a_vision_general).click()
+    planetas = WebDriverWait(google_chrome, 30).until(EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class,'smallplanet')]")))
+
+    lista_a_planetas = []
+    
+    for a in planetas:
+        lista_a_planetas.append(f"//*[@id='{a.get_attribute('id')}']//a")
+
+#ir a vision general y tomar elementos a de planetas
+#ir a imperio y cargar datos para todos los planetas
+def cargar_imperio():
+    global lista_planetas, lista_a_planetas, a_imperio, google_chrome
+    
+    #carga elementos a html en la lista lista_planetas 
+    cargar_a_planetas()
+    
+    google_chrome.find_element(By.XPATH, a_imperio).click()
+    google_chrome.switch_to.window(google_chrome.window_handles[1]) 
+    
+    planetas = WebDriverWait(google_chrome, 160).until(EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@id, 'planet')]")))
+    
+    for indice in range(len(planetas)):
+        if planetas[indice].get_attribute('id') != "planet0":
+
+            p = Planeta(planetas[indice].get_attribute('id'))
+            p.a_ref =lista_a_planetas[indice]
+            lista_planetas.append(p)
+
+    google_chrome.close()
+    google_chrome.switch_to.window(google_chrome.window_handles[0])
+
+def ejecutar_mi_codigo():
+    Scripts.logearse_primera_vez()
+
+    cargar_imperio()
+
+    while True:
+        pass
+
+# Ejecuta la interfaz gráfica en un hilo
+hilo_interfaz = threading.Thread(target=ejecutar_ventana_grafica)
+hilo_interfaz.start()
+
+# Ejecuta la automatización de Selenium en un hilo
+hilo_selenium = threading.Thread(target=ejecutar_mi_codigo)
+hilo_selenium.start()
+
+# Espera a que el hilo de Selenium termine
+hilo_selenium.join()
